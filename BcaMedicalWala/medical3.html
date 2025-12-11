@@ -1,0 +1,1009 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MediStore - Medical Supplies</title>
+    <link rel="icon" href="favi1.jfif" type="image/x-icon">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        }
+
+        .hero {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 130px 0;
+        }
+
+        .product-card {
+            transition: all 0.3s;
+            border: none;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+            border-radius: 16px;
+            overflow: hidden;
+        }
+
+        .product-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .add-cart-btn {
+            background: linear-gradient(45deg, #28a745, #20c997);
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-weight: 600;
+            padding: 12px;
+            transition: all 0.3s;
+        }
+
+        .add-cart-btn:hover:not(.added) {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(40, 167, 69, 0.4);
+        }
+
+        .add-cart-btn.added {
+            background: linear-gradient(45deg, #ffc107, #fd7e14);
+            animation: pulse 0.6s;
+        }
+
+        .add-cart-btn.added::after {
+            content: "Added!";
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 15px;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                transform: scale(1)
+            }
+
+            50% {
+                transform: scale(1.08)
+            }
+        }
+
+        .remove-btn {
+            background: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 34px;
+            height: 34px;
+        }
+
+        .contact-info-xs {
+            font-size: 0.68rem !important;
+        }
+
+        .contact-info-small {
+            font-size: 0.9rem !important;
+        }
+
+        /* CHATBOT ENHANCED STYLES */
+        .chatbot-toggle {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            border: none;
+            border-radius: 50%;
+            color: white;
+            font-size: 24px;
+            box-shadow: 0 10px 30px rgba(16, 185, 129, 0.4);
+            z-index: 9999;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .chatbot-toggle:hover {
+            transform: scale(1.1);
+            box-shadow: 0 15px 40px rgba(16, 185, 129, 0.5);
+        }
+
+        .chatbot-container {
+            position: fixed;
+            bottom: 100px;
+            right: 30px;
+            width: 380px;
+            height: 520px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+            z-index: 9998;
+            display: none;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .chatbot-header {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            padding: 15px 20px;
+            text-align: center;
+            font-weight: 600;
+            position: relative;
+        }
+
+        .chatbot-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            background: #f8f9fa;
+        }
+
+        .chatbot-message {
+            margin: 12px 0;
+            display: flex;
+        }
+
+        .chatbot-message.sent {
+            justify-content: flex-end;
+        }
+
+        .chatbot-message.received {
+            justify-content: flex-start;
+        }
+
+        .chatbot-bubble {
+            max-width: 80%;
+            padding: 14px 18px;
+            border-radius: 20px;
+            word-wrap: break-word;
+        }
+
+        .chatbot-message.sent .chatbot-bubble {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+        }
+
+        .chatbot-message.received .chatbot-bubble {
+            background: white;
+            color: #333;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .chatbot-time {
+            font-size: 11px;
+            opacity: 0.7;
+            margin-top: 4px;
+            text-align: right;
+        }
+
+        /* QUICK BUTTONS */
+        .chatbot-quick-buttons {
+            padding: 0 20px 10px;
+        }
+
+        .chatbot-quick-btn {
+            display: inline-block;
+            margin: 4px;
+            padding: 8px 16px;
+            background: #e9ecef;
+            color: #495057;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: all 0.2s;
+        }
+
+        .chatbot-quick-btn:hover {
+            background: #10b981;
+            color: white;
+            transform: translateY(-1px);
+        }
+
+        .chatbot-input {
+            display: flex;
+            padding: 15px;
+            background: white;
+            border-top: 1px solid #eee;
+            gap: 10px;
+        }
+
+        .chatbot-input input {
+            flex: 1;
+            padding: 12px 16px;
+            border: 2px solid #eee;
+            border-radius: 25px;
+            outline: none;
+            font-size: 15px;
+        }
+
+        .chatbot-input input:focus {
+            border-color: #10b981;
+        }
+
+        .chatbot-send {
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+
+        .chatbot-send:hover {
+            transform: scale(1.05);
+        }
+
+        @media (max-width: 768px) {
+            .chatbot-container {
+                width: calc(100vw - 60px);
+                right: 30px;
+                bottom: 20px;
+                height: 70vh;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- [NAVBAR, CONTACT MODAL, CART MODAL, PRODUCT MODAL, HERO, ALL 20 PRODUCTS - SAME AS BEFORE] -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top shadow">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="#">BcaMedicalWala</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="#home">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#products">Products</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#cartModal"
+                            id="cartLink">Cart (0)</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#" data-bs-toggle="modal"
+                            data-bs-target="#contactModal">Contact</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- CONTACT MODAL -->
+    <div class="modal fade" id="contactModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content rounded-4">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title">MediStore Contact</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row g-4 text-center">
+                        <div class="col-md-4">
+                            <div class="bg-success p-4 rounded text-white">
+                                <i class="fas fa-phone fa-3x mb-3"></i>
+                                <h5>Pharmacy</h5>
+                                <a href="tel:+917517262390" class="fw-bold d-block contact-info-small">+91 75172
+                                    62390</a>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="bg-info p-4 rounded text-white">
+                                <i class="fas fa-envelope fa-3x mb-3"></i>
+                                <h5>Email</h5>
+                                <a href="mailto:shubhamdhokchaule05@gmail.com"
+                                    class="fw-bold d-block contact-info-xs text-white text-decoration-underline">
+                                    shubhamdhokchaule05@gmail.com
+                                </a>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="bg-danger p-4 rounded text-white">
+                                <i class="fas fa-map-marker-alt fa-3x mb-3"></i>
+                                <h5>Location</h5>
+                                <div>Shrirampur<br>Maharashtra, India</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- CART MODAL (same as before) -->
+    <div class="modal fade" id="cartModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content rounded-4">
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title">Shopping Cart</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="cartItems"></div>
+                    <div id="emptyCartMsg" class="text-center py-5">
+                        <i class="fas fa-shopping-cart fa-5x text-muted mb-3"></i>
+                        <h5 class="text-muted">Your cart is empty</h5>
+                        <a href="#products" class="btn btn-primary">Start Shopping</a>
+                    </div>
+                    <div class="border-top pt-3 d-none" id="cartTotalRow">
+                        <div class="d-flex justify-content-between fs-4 fw-bold text-success">
+                            <span>Total:</span>
+                            <span id="cartTotal">₹0</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" data-bs-dismiss="modal">Continue Shopping</button>
+                    <button class="btn btn-success d-none" id="checkoutBtn">Proceed to Checkout</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PRODUCT DETAILS MODAL -->
+    <div class="modal fade" id="productModal" tabindex="-1">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content rounded-4">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="productTitle">Product Details</h5>
+                    <button type="button" class="btn-close
+                    <button type=" button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" id="productDetails"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- HERO -->
+    <section id="home" class="hero text-center text-white">
+        <div class="container">
+            <h1 class="display-4 fw-bold mb-4">BCA Medical Wala</h1>
+            <p class="lead mb-5">24+ Genuine Medicines • Fast Delivery in Shrirampur</p>
+            <a href="#products" class="btn btn-light btn-lg px-5 py-3 shadow">Shop Now</a>
+        </div>
+    </section>
+
+    <!-- PRODUCTS -->
+    <section id="products" class="py-5 bg-light">
+        <div class="container">
+            <h2 class="text-center mb-5 fw-bold display-5 text-primary">Our Products</h2>
+            <div class="row g-4">
+
+                <!-- 1 -->
+                <div class="col-lg-3 col-md-4 col-sm-6">
+                    <div class="card product-card h-100"
+                        data-product='{"name":"Paracetamol 650mg (15 tabs)","price":0.49,"uses":"Fever & Pain","mfg":"2025","exp":"2027","dosage":"1 tab every 6 hrs"}'>
+                        <img src="paracetamol.png" class="card-img-top">
+                        <div class="card-body d-flex flex-column">
+                            <h6>Paracetamol 650mg</h6>
+                            <p class="text-success fw-bold fs-4 mt-auto">₹40</p>
+                            <button class="btn add-cart-btn w-100 mt-3" data-product-name="Paracetamol 650mg"
+                                data-product-price="0.49">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2 -->
+                <div class="col-lg-3 col-md-4 col-sm-6">
+                    <div class="card product-card h-100"
+                        data-product='{"name":"Limcee Vitamin C","price":0.39,"uses":"Immunity","mfg":"2025","exp":"2027","dosage":"1 daily"}'>
+                        <img src="LIMCEE.png" class="card-img-top">
+                        <div class="card-body d-flex flex-column">
+                            <h6>Limcee Vitamin C</h6>
+                            <p class="text-success fw-bold fs-4 mt-auto">₹32</p>
+                            <button class="btn add-cart-btn w-100 mt-3" data-product-name="Limcee Vitamin C"
+                                data-product-price="0.39">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3 -->
+                <div class="col-lg-3 col-md-4 col-sm-6">
+                    <div class="card product-card h-100"
+                        data-product='{"name":"Cetirizine 10mg","price":0.35,"uses":"Allergy","mfg":"2025","exp":"2027","dosage":"1 at night"}'>
+                        <img src="CITRIZI.png" class="card-img-top">
+                        <div class="card-body d-flex flex-column">
+                            <h6>Cetirizine 10mg</h6>
+                            <p class="text-success fw-bold fs-4 mt-auto">₹29</p>
+                            <button class="btn add-cart-btn w-100 mt-3" data-product-name="Cetirizine 10mg"
+                                data-product-price="0.35">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 4 -->
+                <div class="col-lg-3 col-md-4 col-sm-6">
+                    <div class="card product-card h-100"
+                        data-product='{"name":"Dolo 650 (15 tabs)","price":0.59,"uses":"Fever & Pain","mfg":"2025","exp":"2027","dosage":"1 tab SOS"}'>
+                        <img src="DOLO 650mg.png" class="card-img-top">
+                        <div class="card-body d-flex flex-column">
+                            <h6>Dolo 650</h6>
+                            <p class="text-success fw-bold fs-4 mt-auto">₹48</p>
+                            <button class="btn add-cart-btn w-100 mt-3" data-product-name="Dolo 650"
+                                data-product-price="0.59">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 5 -->
+                <div class="col-lg-3 col-md-4 col-sm-6">
+                    <div class="card product-card h-100"
+                        data-product='{"name":"Electral ORS (5 sachets)","price":0.69,"uses":"Dehydration","mfg":"2025","exp":"2026","dosage":"1 in 200ml water"}'>
+                        <img src="ors.jpg" class="card-img-top">
+                        <div class="card-body d-flex flex-column">
+                            <h6>Electral ORS</h6>
+                            <p class="text-success fw-bold fs-4 mt-auto">₹57</p>
+                            <button class="btn add-cart-btn w-100 mt-3" data-product-name="Electral ORS"
+                                data-product-price="0.69">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 6 -->
+                <div class="col-lg-3 col-md-4 col-sm-6">
+                    <div class="card product-card h-100"
+                        data-product='{"name":"Accu-Chek Strips (50)","price":14.99,"uses":"Blood Sugar Test","mfg":"2025","exp":"2026"}'>
+                        <img src="Accu-check.jpg"
+                            class="card-img-top">
+                        <div class="card-body d-flex flex-column">
+                            <h6>Accu-Chek Strips</h6>
+                            <p class="text-success fw-bold fs-4 mt-auto">₹1,229</p>
+                            <button class="btn add-cart-btn w-100 mt-3" data-product-name="Accu-Chek Strips"
+                                data-product-price="14.99">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 7 -->
+                <div class="col-lg-3 col-md-4 col-sm-6">
+                    <div class="card product-card h-100"
+                        data-product='{"name":"Liv-52 Tablets","price":1.59,"uses":"Liver Health","mfg":"2025","exp":"2027"}'>
+                        <img src="liv.webp" class="card-img-top">
+                        <div class="card-body d-flex flex-column">
+                            <h6>Liv-52 Tablets</h6>
+                            <p class="text-success fw-bold fs-4 mt-auto">₹130</p>
+                            <button class="btn add-cart-btn w-100 mt-3" data-product-name="Liv-52 Tablets"
+                                data-product-price="1.59">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 8 -->
+                <div class="col-lg-3 col-md-4 col-sm-6">
+                    <div class="card product-card h-100"
+                        data-product='{"name":"Neurobion Forte","price":0.49,"uses":"Vitamin B Deficiency","mfg":"2025","exp":"2027"}'>
+                        <img src="neurobion.jfif" class="card-img-top">
+                        <div class="card-body d-flex flex-column">
+                            <h6>Neurobion Forte</h6>
+                            <p class="text-success fw-bold fs-4 mt-auto">₹40</p>
+                            <button class="btn add-cart-btn w-100 mt-3" data-product-name="Neurobion Forte"
+                                data-product-price="0.49">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 9 -->
+                <div class="col-lg-3 col-md-4 col-sm-6">
+                    <div class="card product-card h-100"
+                        data-product='{"name":"Azithral 500mg","price":2.79,"uses":"Infection","mfg":"2025","exp":"2027"}'>
+                        <img src="azithral.jfif" class="card-img-top">
+                        <div class="card-body d-flex flex-column">
+                            <h6>Azithral 500mg</h6>
+                            <p class="text-success fw-bold fs-4 mt-auto">₹229</p>
+                            <button class="btn add-cart-btn w-100 mt-3" data-product-name="Azithral 500mg"
+                                data-product-price="2.79">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 11 -->
+                <div class="col-lg-3 col-md-4 col-sm-6">
+                    <div class="card product-card h-100"
+                        data-product='{"name":"Omron BP Monitor","price":29.99,"uses":"Blood Pressure"}'>
+                        <img src="omron.webp" class="card-img-top">
+                        <div class="card-body d-flex flex-column">
+                            <h6>Omron BP Monitor</h6>
+                            <p class="text-success fw-bold fs-4 mt-auto">₹2,459</p>
+                            <button class="btn add-cart-btn w-100 mt-3" data-product-name="Omron BP Monitor"
+                                data-product-price="29.99">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 12 -->
+                <div class="col-lg-3 col-md-4 col-sm-6">
+                    <div class="card product-card h-100"
+                        data-product='{"name":"Protinex Powder 400g","price":7.99,"uses":"Protein Supplement"}'>
+                        <img src="protinex.webp" class="card-img-top">
+                        <div class="card-body d-flex flex-column">
+                            <h6>Protinex 400g</h6>
+                            <p class="text-success fw-bold fs-4 mt-auto">₹655</p>
+                            <button class="btn add-cart-btn w-100 mt-3" data-product-name="Protinex Powder 400g"
+                                data-product-price="7.99">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 13 -->
+                <div class="col-lg-3 col-md-4 col-sm-6">
+                    <div class="card product-card h-100"
+                        data-product='{"name":"Absorbent Cotton 500g","price":1.99,"uses":"Wound Dressing"}'>
+                        <img src="cotton.jfif" class="card-img-top">
+                        <div class="card-body d-flex flex-column">
+                            <h6>Cotton 500g</h6>
+                            <p class="text-success fw-bold fs-4 mt-auto">₹163</p>
+                            <button class="btn add-cart-btn w-100 mt-3" data-product-name="Absorbent Cotton 500g"
+                                data-product-price="1.99">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 14 -->
+                <div class="col-lg-3 col-md-4 col-sm-6">
+                    <div class="card product-card h-100"
+                        data-product='{"name":"Betadine 500ml","price":3.99,"uses":"Antiseptic"}'>
+                        <img src="betadine.webp" class="card-img-top">
+                        <div class="card-body d-flex flex-column">
+                            <h6>Betadine 500ml</h6>
+                            <p class="text-success fw-bold fs-4 mt-auto">₹327</p>
+                            <button class="btn add-cart-btn w-100 mt-3" data-product-name="Betadine 500ml"
+                                data-product-price="3.99">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 15 -->
+                <div class="col-lg-3 col-md-4 col-sm-6">
+                    <div class="card product-card h-100"
+                        data-product='{"name":"Volini Spray 100g","price":2.49,"uses":"Pain Relief"}'>
+                        <img src="volini.jfif" class="card-img-top">
+                        <div class="card-body d-flex flex-column">
+                            <h6>Volini Spray</h6>
+                            <p class="text-success fw-bold fs-4 mt-auto">₹204</p>
+                            <button class="btn add-cart-btn w-100 mt-3" data-product-name="Volini Spray 100g"
+                                data-product-price="2.49">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+
+                
+
+                <!-- 17 -->
+                <div class="col-lg-3 col-md-4 col-sm-6">
+                    <div class="card product-card h-100"
+                        data-product='{"name":"Zincovit Tablets","price":1.29,"uses":"Multivitamin"}'>
+                        <img src="ZIN0036_1_1.webp" class="card-img-top">
+                        <div class="card-body d-flex flex-column">
+                            <h6>Zincovit Tablets</h6>
+                            <p class="text-success fw-bold fs-4 mt-auto">₹106</p>
+                            <button class="btn add-cart-btn w-100 mt-3" data-product-name="Zincovit Tablets"
+                                data-product-price="1.29">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 18 -->
+                <div class="col-lg-3 col-md-4 col-sm-6">
+                    <div class="card product-card h-100"
+                        data-product='{"name":"Crocin Advance","price":0.49,"uses":"Fever"}'>
+                        <img src="crocin.jfif" class="card-img-top">
+                        <div class="card-body d-flex flex-column">
+                            <h6>Crocin Advance</h6>
+                            <p class="text-success fw-bold fs-4 mt-auto">₹40</p>
+                            <button class="btn add-cart-btn w-100 mt-3" data-product-name="Crocin Advance"
+                                data-product-price="0.49">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+
+               
+
+               
+
+            </div>
+        </div>
+    </section>
+
+    <!-- CHATBOT BUTTON -->
+    <button class="chatbot-toggle" id="chatbotToggle" title="Chat with MediStore Assistant">
+        <i class="fas fa-comments"></i>
+    </button>
+
+    <!-- CHATBOT CONTAINER -->
+    <div class="chatbot-container" id="chatbotContainer">
+        <div class="chatbot-header">
+            🏥BCA MedicalWala Assistant
+            <button class="btn-close btn-close-white position-absolute end-0 me-3" id="chatbotClose"></button>
+        </div>
+
+        <!-- QUICK SUGGESTION BUTTONS -->
+        <div class="chatbot-quick-buttons">
+            <button class="chatbot-quick-btn" data-q="Show fever medicines">Fever Medicines</button>
+            <button class="chatbot-quick-btn" data-q="Show pain relief medicines">Pain Relief</button>
+            <button class="chatbot-quick-btn" data-q="Show vitamin medicines">Vitamins</button>
+            <button class="chatbot-quick-btn" data-q="What are today offers">Offers</button>
+        </div>
+
+        <div id="chatbotMessages" class="chatbot-messages">
+            <div class="chatbot-message received">
+                <div class="chatbot-bubble">
+                    Hello! Welcome to MediStore 💊<br>
+                    Ask about any medicine (Paracetamol, Dolo, N95), stock, dosage, or say things like:<br>
+                    • "show Dolo 650 details"<br>
+                    • "add 2 Dolo 650 to cart"
+                    <div class="chatbot-time">Just now</div>
+                </div>
+            </div>
+        </div>
+        <div class="chatbot-input">
+            <input type="text" id="chatbotInput" placeholder="Ask about Paracetamol, cart, offers..." maxlength="500">
+            <button class="chatbot-send" id="chatbotSend">Send</button>
+        </div>
+    </div>
+
+    <footer class="bg-dark text-white py-4 text-center">
+        <div class="container">
+            <p class="mb-0">&copy; 2025 MediStore • Licensed Pharmacy • Shrirampur</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const exchangeRate = 82;
+        let cart = JSON.parse(localStorage.getItem('mediCart') || '[]');
+        let adding = false;
+
+        function updateCart() {
+            const totalItems = cart.reduce((s, i) => s + i.quantity, 0);
+            document.getElementById('cartLink').innerHTML = `Cart (${totalItems})`;
+
+            const itemsEl = document.getElementById('cartItems');
+            const empty = document.getElementById('emptyCartMsg');
+            const totalRow = document.getElementById('cartTotalRow');
+            const checkout = document.getElementById('checkoutBtn');
+            const totalEl = document.getElementById('cartTotal');
+
+            if (cart.length === 0) {
+                itemsEl.innerHTML = '';
+                empty.classList.remove('d-none');
+                totalRow.classList.add('d-none');
+                checkout.classList.add('d-none');
+                return;
+            }
+            empty.classList.add('d-none');
+            let total = 0;
+            itemsEl.innerHTML = cart.map((item, i) => {
+                const lineTotal = item.price * item.quantity * exchangeRate;
+                total += item.price * item.quantity;
+                return `<div class="d-flex justify-content-between align-items-center p-3 border-bottom">
+                <div>
+                    <h6 class="mb-1">${item.name}</h6>
+                    <small class="text-muted">₹${(item.price * exchangeRate).toFixed(0)} × ${item.quantity}</small>
+                </div>
+                <div class="text-end">
+                    <div class="fw-bold text-success">₹${lineTotal.toFixed(0)}</div>
+                    <button class="btn remove-btn mt-2" onclick="cart.splice(${i},1); localStorage.setItem('mediCart',JSON.stringify(cart)); updateCart()">×</button>
+                </div>
+            </div>`;
+            }).join('');
+            totalEl.textContent = `₹${(total * exchangeRate).toFixed(0)}`;
+            totalRow.classList.remove('d-none');
+            checkout.classList.remove('d-none');
+        }
+
+        function addToCart(name, price, qty = 1) {
+            if (adding) return;
+            adding = true;
+            const ex = cart.find(i => i.name === name);
+            if (ex) ex.quantity += qty;
+            else cart.push({ name, price: parseFloat(price), quantity: qty });
+            localStorage.setItem('mediCart', JSON.stringify(cart));
+            updateCart();
+            setTimeout(() => adding = false, 800);
+        }
+
+        // ------------- CHATBOT ENHANCED LOGIC -------------
+        const chatbotToggle = document.getElementById('chatbotToggle');
+        const chatbotContainer = document.getElementById('chatbotContainer');
+        const chatbotClose = document.getElementById('chatbotClose');
+        const chatbotMessages = document.getElementById('chatbotMessages');
+        const chatbotInput = document.getElementById('chatbotInput');
+        const chatbotSend = document.getElementById('chatbotSend');
+        const quickButtons = document.querySelectorAll('.chatbot-quick-btn');
+
+        // stock synced with site products (price in INR for chatbot text)
+        const medicineStock = {
+            'paracetamol 650mg': { stock: 150, price: 40, dosage: '1–2 tablets every 6 hours' },
+            'limcee vitamin c': { stock: 200, price: 32, dosage: '1 tablet daily' },
+            'cetirizine 10mg': { stock: 80, price: 29, dosage: '1 tablet at night' },
+            'dolo 650': { stock: 120, price: 48, dosage: '1 tablet SOS for fever & pain' },
+            'electral ors': { stock: 90, price: 57, dosage: '1 sachet in 200ml water' },
+            'accu-chek strips': { stock: 30, price: 1229, dosage: 'Use with glucometer as needed' },
+            'liv-52 tablets': { stock: 60, price: 130, dosage: '1–2 tablets daily or as advised' },
+            'neurobion forte': { stock: 70, price: 40, dosage: '1 tablet daily' },
+            'azithral 500mg': { stock: 40, price: 229, dosage: 'As prescribed by doctor' },
+            'omez 20mg': { stock: 100, price: 81, dosage: '1 capsule before food' },
+            'omron bp monitor': { stock: 15, price: 2459, dosage: 'Use as per manual' },
+            'protinex 400g': { stock: 25, price: 655, dosage: '1–2 scoops daily in milk/water' },
+            'cotton 500g': { stock: 50, price: 163, dosage: 'Use for wound dressing' },
+            'betadine 500ml': { stock: 35, price: 327, dosage: 'Apply on affected area' },
+            'volini spray': { stock: 45, price: 204, dosage: 'Spray on painful area 3–4 times/day' },
+            'preganews kit': { stock: 60, price: 65, dosage: 'Use once with first-morning urine' },
+            'zincovit tablets': { stock: 90, price: 106, dosage: '1 tablet daily after food' },
+            'crocin advance': { stock: 110, price: 40, dosage: '1–2 tablets every 6 hours' },
+            'surgical masks (100)': { stock: 40, price: 409, dosage: 'Wear when required' },
+            '3m n95 mask': { stock: 80, price: 245, dosage: 'Wear to cover nose and mouth' }
+        };
+
+        // mapping display names (as in cards) to keys + JS price (USD) for addToCart
+        const productMap = {
+            'Paracetamol 650mg': { key: 'paracetamol 650mg', jsPrice: 0.49 },
+            'Limcee Vitamin C': { key: 'limcee vitamin c', jsPrice: 0.39 },
+            'Cetirizine 10mg': { key: 'cetirizine 10mg', jsPrice: 0.35 },
+            'Dolo 650': { key: 'dolo 650', jsPrice: 0.59 },
+            'Electral ORS': { key: 'electral ors', jsPrice: 0.69 },
+            'Accu-Chek Strips': { key: 'accu-chek strips', jsPrice: 14.99 },
+            'Liv-52 Tablets': { key: 'liv-52 tablets', jsPrice: 1.59 },
+            'Neurobion Forte': { key: 'neurobion forte', jsPrice: 0.49 },
+            'Azithral 500mg': { key: 'azithral 500mg', jsPrice: 2.79 },
+            'Omez 20mg': { key: 'omez 20mg', jsPrice: 0.99 },
+            'Omron BP Monitor': { key: 'omron bp monitor', jsPrice: 29.99 },
+            'Protinex Powder 400g': { key: 'protinex 400g', jsPrice: 7.99 },
+            'Absorbent Cotton 500g': { key: 'cotton 500g', jsPrice: 1.99 },
+            'Betadine 500ml': { key: 'betadine 500ml', jsPrice: 3.99 },
+            'Volini Spray 100g': { key: 'volini spray', jsPrice: 2.49 },
+            'Preganews Kit': { key: 'preganews kit', jsPrice: 0.79 },
+            'Zincovit Tablets': { key: 'zincovit tablets', jsPrice: 1.29 },
+            'Crocin Advance': { key: 'crocin advance', jsPrice: 0.49 },
+            'Surgical Masks (100)': { key: 'surgical masks (100)', jsPrice: 4.99 },
+            '3M N95 Mask': { key: '3m n95 mask', jsPrice: 2.99 }
+        };
+
+        function findMedicineKey(text) {
+            const t = text.toLowerCase();
+            const aliases = {
+                'paracetamol': 'paracetamol 650mg',
+                'vitamin c': 'limcee vitamin c',
+                'limcee': 'limcee vitamin c',
+                'cetirizine': 'cetirizine 10mg',
+                'dolo': 'dolo 650',
+                'dolo 650': 'dolo 650',
+                'ors': 'electral ors',
+                'electral': 'electral ors',
+                'accu chek': 'accu-chek strips',
+                'accuchek': 'accu-chek strips',
+                'liv 52': 'liv-52 tablets',
+                'liv-52': 'liv-52 tablets',
+                'neurobion': 'neurobion forte',
+                'azithral': 'azithral 500mg',
+                'omez': 'omez 20mg',
+                'bp monitor': 'omron bp monitor',
+                'protinex': 'protinex 400g',
+                'cotton': 'cotton 500g',
+                'betadine': 'betadine 500ml',
+                'volini': 'volini spray',
+                'preganews': 'preganews kit',
+                'zincovit': 'zincovit tablets',
+                'crocin': 'crocin advance',
+                'surgical mask': 'surgical masks (100)',
+                'surgical masks': 'surgical masks (100)',
+                'mask n95': '3m n95 mask',
+                'n95': '3m n95 mask'
+            };
+
+            for (const key in aliases) {
+                if (t.includes(key)) return aliases[key];
+            }
+            for (const fullName in medicineStock) {
+                if (t.includes(fullName)) return fullName;
+            }
+            return null;
+        }
+
+        function appendChatMessage(isSent, text) {
+            const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            const div = document.createElement('div');
+            div.className = `chatbot-message ${isSent ? 'sent' : 'received'}`;
+            div.innerHTML = `<div class="chatbot-bubble">${text}<div class="chatbot-time">${time}</div></div>`;
+            chatbotMessages.appendChild(div);
+            chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
+        }
+
+        // open product modal from chatbot
+        function openProductModalByKey(key) {
+            const displayName = Object.keys(productMap).find(name => productMap[name].key === key);
+            if (!displayName) return false;
+            const cards = document.querySelectorAll('.product-card');
+            for (const card of cards) {
+                const title = card.querySelector('h6').textContent.trim();
+                if (title.toLowerCase() === displayName.toLowerCase()) {
+                    const d = JSON.parse(card.dataset.product);
+                    document.getElementById('productTitle').textContent = d.name;
+                    document.getElementById('productDetails').innerHTML = `
+                    <div class="row">
+                        <div class="col-md-5">
+                            <img src="${card.querySelector('img').src}" class="img-fluid rounded shadow">
+                        </div>
+                        <div class="col-md-7">
+                            <h5>${d.name}</h5>
+                            <p><strong>Price:</strong> ₹${(d.price * exchangeRate).toFixed(0)}</p>
+                            <p><strong>Uses:</strong> ${d.uses}</p>
+                            ${d.dosage ? `<p><strong>Dosage:</strong> ${d.dosage}</p>` : ''}
+                            <p><strong>Mfg:</strong> ${d.mfg} | <strong>Exp:</strong> ${d.exp}</p>
+                        </div>
+                    </div>`;
+                    new bootstrap.Modal('#productModal').show();
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        // parse "add 2 dolo 650 to cart"
+        function parseAddToCartCommand(text) {
+            const t = text.toLowerCase();
+            if (!t.includes('add')) return null;
+            if (!t.includes('cart') && !t.includes('order')) return null;
+
+            let qty = 1;
+            const match = t.match(/add\s+(\d+)\s+/);
+            if (match) qty = parseInt(match[1], 10);
+
+            const withoutAdd = t.replace(/add\s+\d*/, 'add').replace('to cart', '').replace('to order', '');
+            const medKey = findMedicineKey(withoutAdd);
+            if (!medKey) return null;
+
+            const displayName = Object.keys(productMap).find(n => productMap[n].key === medKey);
+            if (!displayName) return null;
+
+            return { medKey, displayName, qty };
+        }
+
+        function getPharmacyResponse(userText) {
+            const text = userText.toLowerCase().trim();
+
+            // 1) try add-to-cart command
+            const addCmd = parseAddToCartCommand(text);
+            if (addCmd) {
+                const data = productMap[addCmd.displayName];
+                addToCart(addCmd.displayName, data.jsPrice, addCmd.qty);
+                return `🛒 Added <strong>${addCmd.qty} × ${addCmd.displayName}</strong> to your cart.<br>Open the Cart from top menu to checkout.`;
+            }
+
+            // 2) open product details: "show dolo 650 details"
+            if (text.startsWith('show ') || text.includes('details')) {
+                const medKey = findMedicineKey(text);
+                if (medKey) {
+                    openProductModalByKey(medKey);
+                    const item = medicineStock[medKey];
+                    return `📄 Opened details for <strong>${medKey.toUpperCase()}</strong> on the page.<br>Price: ₹${item.price}, Stock: ${item.stock}.`;
+                }
+            }
+
+            // 3) normal medicine info
+            const medKey = findMedicineKey(text);
+            if (medKey) {
+                const item = medicineStock[medKey];
+                return `💊 <strong>${medKey.toUpperCase()}</strong><br>✅ Stock: ${item.stock} available<br>💰 Price: ₹${item.price}<br>📋 Dosage: ${item.dosage}`;
+            }
+
+            // 4) category / quick buttons
+            if (text.includes('fever medicines')) {
+                return "🤒 Fever medicines:<br>• Paracetamol 650mg<br>• Dolo 650<br>• Crocin Advance<br>Type any name to see stock or add to cart.";
+            }
+            if (text.includes('pain relief')) {
+                return "💥 Pain relief:<br>• Dolo 650<br>• Volini Spray<br>• Paracetamol 650mg<br>Ask details or say: add 1 Volini to cart.";
+            }
+            if (text.includes('vitamin') || text.includes('vitamins')) {
+                return "💊 Vitamins & supplements:<br>• Limcee Vitamin C<br>• Neurobion Forte<br>• Zincovit Tablets<br>Ask about any one for stock & dosage.";
+            }
+
+            // 5) general queries
+            if (text.includes('stock') || text.includes('available')) {
+                return "🔥 Popular medicines in stock:<br>• Paracetamol 650mg<br>• Dolo 650<br>• Crocin Advance<br>• Limcee Vitamin C<br>Ask about any specific medicine name!";
+            }
+            if (text.includes('hours') || text.includes('timing')) {
+                return "⏰ Store Hours:<br>Mon–Sat: 8AM – 10PM<br>Sunday: 9AM – 9PM<br>🚚 24/7 Home Delivery in Shrirampur!";
+            }
+            if (text.includes('delivery')) {
+                return "🚚 Free delivery within 5km for orders above ₹500.<br>Usual delivery time: 30–60 minutes.";
+            }
+            if (text.includes('offer') || text.includes('discount')) {
+                return "🎉 Offers:<br>• 10% off on first online order<br>• Special prices on vitamins & supplements.";
+            }
+            if (text.includes('cart')) {
+                return "🛒 You can ask me to add medicines, for example: \"add 2 Dolo 650 to cart\" or open the Cart from the top menu.";
+            }
+            if (text.includes('hello') || text.includes('hi') || text.includes('namaste')) {
+                return "Namaste! 👋 Ask about any medicine (stock, price, dosage), or say \"show Dolo 650 details\" or \"add 1 N95 to cart\".";
+            }
+            if (text.includes('help')) {
+                return "I can help you with:<br>• Medicine stock & price<br>• Opening product details<br>• Adding items to cart<br>• Store hours & delivery.";
+            }
+
+            return `Sorry, I didn't understand "${userText}". Try things like:<br>• "Paracetamol stock"<br>• "show Dolo 650 details"<br>• "add 2 Crocin to cart"`;
+        }
+
+        function sendChatMessage(textFromButton = null) {
+            const text = textFromButton || chatbotInput.value.trim();
+            if (!text) return;
+            appendChatMessage(true, text);
+            chatbotInput.value = '';
+            setTimeout(() => {
+                const res = getPharmacyResponse(text);
+                appendChatMessage(false, res);
+            }, 500 + Math.random() * 400);
+        }
+
+        chatbotToggle.addEventListener('click', () => {
+            chatbotContainer.style.display = 'flex';
+            chatbotInput.focus();
+        });
+        chatbotClose.addEventListener('click', () => {
+            chatbotContainer.style.display = 'none';
+        });
+        chatbotSend.addEventListener('click', () => sendChatMessage());
+        chatbotInput.addEventListener('keypress', e => {
+            if (e.key === 'Enter') sendChatMessage();
+        });
+        quickButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const q = btn.getAttribute('data-q');
+                sendChatMessage(q);
+            });
+        });
+
+        // PRODUCT CLICK / ADD TO CART FROM CARDS
+        document.addEventListener('click', e => {
+            const btn = e.target.closest('.add-cart-btn');
+            if (btn) {
+                btn.classList.add('added');
+                btn.disabled = true;
+                btn.innerHTML = 'Added!';
+                addToCart(btn.dataset.productName, btn.dataset.productPrice);
+                setTimeout(() => {
+                    btn.classList.remove('added');
+                    btn.disabled = false;
+                    btn.innerHTML = 'Add to Cart';
+                }, 1000);
+            }
+
+            if (e.target.closest('.product-card') && !e.target.closest('.add-cart-btn')) {
+                const card = e.target.closest('.product-card');
+                const d = JSON.parse(card.dataset.product);
+                document.getElementById('productTitle').textContent = d.name;
+                document.getElementById('productDetails').innerHTML = `
+                <div class="row">
+                    <div class="col-md-5">
+                        <img src="${card.querySelector('img').src}" class="img-fluid rounded shadow">
+                    </div>
+                    <div class="col-md-7">
+                        <h5>${d.name}</h5>
+                        <p><strong>Price:</strong> ₹${(d.price * exchangeRate).toFixed(0)}</p>
+                        <p><strong>Uses:</strong> ${d.uses}</p>
+                        ${d.dosage ? `<p><strong>Dosage:</strong> ${d.dosage}</p>` : ''}
+                        <p><strong>Mfg:</strong> ${d.mfg} | <strong>Exp:</strong> ${d.exp}</p>
+                    </div>
+                </div>`;
+                new bootstrap.Modal('#productModal').show();
+            }
+        });
+
+        document.getElementById('cartModal').addEventListener('shown.bs.modal', updateCart);
+        updateCart();
+    </script>
+</body>
+
+</html>
